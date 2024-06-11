@@ -55,15 +55,25 @@ export function internalNftOnApprove({
         saleConditions: saleConditions.sale_conditions //the sale conditions 
     }));
     // Handle byOwnerId
-    let byOwnerId = contract.byOwnerId.get(ownerId) as string[] | null;
-    let ownerSet: Set<string> = new Set<string>(byOwnerId || []);
+    let byOwnerId = contract.byOwnerId.get(ownerId);
+    let ownerSet: Set<string>;
+    if (Array.isArray(byOwnerId)) {
+        ownerSet = new Set<string>(byOwnerId);
+    } else {
+        ownerSet = new Set<string>();
+    }
 
     ownerSet.add(contractAndTokenId);
     contract.byOwnerId.set(ownerId, Array.from(ownerSet));
 
     // Handle byNftContractId
-    let byNftContractId = contract.byNftContractId.get(contractId) as string[] | null;
-    let nftSet: Set<string> = new Set<string>(byNftContractId || []);
+    let byNftContractId = contract.byNftContractId.get(contractId);
+    let nftSet: Set<string>;
+    if (Array.isArray(byNftContractId)) {
+        nftSet = new Set<string>(byNftContractId);
+    } else {
+        nftSet = new Set<string>();
+    }
 
     nftSet.add(tokenId);
     contract.byNftContractId.set(contractId, Array.from(nftSet));
