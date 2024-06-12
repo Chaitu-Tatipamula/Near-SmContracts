@@ -6,7 +6,11 @@ export function restoreOwners(collection: any): Set<string> | null {
     if (collection == null) {
         return null;
     }
-    return new Set(collection as string[]);
+    if (Array.isArray(collection)) {
+        return new Set(collection as string[]);
+    } else {
+        near.panic("Invalid collection format");
+    }
 }
 
 
@@ -38,7 +42,7 @@ export function internallyRemoveSale(contract: Contract, nftContractId: string, 
         contract.byOwnerId.remove(sale.owner_id);
     //if the set of sales is not empty after removing, we insert the set back into the map for the owner
     } else {
-        contract.byOwnerId.set(sale.owner_id, byOwnerId);
+        contract.byOwnerId.set(sale.owner_id, Array.from(byOwnerId));
     }
 
     //get the set of token IDs for sale for the nft contract ID. If there's no sale, panic. 
@@ -48,13 +52,13 @@ export function internallyRemoveSale(contract: Contract, nftContractId: string, 
     }
     
     //remove the token ID from the set 
-    byNftContractId.add(tokenId);
+    byNftContractId.delete(tokenId);
     //if the set is now empty after removing the token ID, we remove that nft contract ID from the map
     if (byNftContractId.size==0) {
         contract.byNftContractId.remove(nftContractId);
     //if the set is not empty after removing, we insert the set back into the map for the nft contract ID
     } else {
-        contract.byNftContractId.set(nftContractId, byNftContractId);
+        contract.byNftContractId.set(nftContractId,  Array.from(byNftContractId));
     }
 
     //return the sale object

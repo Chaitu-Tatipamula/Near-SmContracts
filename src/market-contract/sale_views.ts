@@ -1,4 +1,5 @@
-import { Contract } from ".";
+import { log } from "near-sdk-js/lib/api";
+import { Contract, DELIMETER } from ".";
 import { restoreOwners } from "./internal";
 import { Sale } from "./sale";
     
@@ -56,6 +57,7 @@ export function internalSalesByOwnerId({
     let max = limit ? limit : 50;
 
     let keys = Array.from(tokenSet.values());
+    log(`Token IDs for owner contract (${accountId}): ${keys}`);
     let sales: Sale[] = []
     for(let i = start; i < max; i++) {
         if(i >= keys.length) {
@@ -66,6 +68,7 @@ export function internalSalesByOwnerId({
             sales.push(sale);
         }
     }
+    log(`Retrieved Sales for owner (${accountId}): ${sales}`);
     return sales;
 }
 
@@ -113,16 +116,20 @@ export function internalSalesByNftContractId({
     let max = limit ? limit : 50;
 
     let keys = Array.from(tokenSet.values());
+    log(`Token IDs for NFT contract (${accountId}): ${keys}`);
     let sales: Sale[] = []
     for(let i = start; i < max; i++) {
         if(i >= keys.length) {
             break;
-        }
-        let sale = contract.sales.get(keys[i]) as Sale; 
+            }
+        let contractTokenId = `${accountId}${DELIMETER}${keys[i]}`;
+        let sale = contract.sales.get(contractTokenId) as Sale; 
+        log(`sale : ${sale}`);
         if (sale != null) {
             sales.push(sale);
         }
     }
+    log(`Retrieved Sales for NFT contract (${accountId}): ${sales}`);
     return sales;
 }
 
